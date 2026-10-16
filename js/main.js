@@ -5,6 +5,59 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* ---------- Language (EN/ID) ---------- */
+let lang = 'en';
+const t = (s) => (lang === 'id' && ID[s]) || s;
+
+(() => {
+  const norm = (s) => s.replace(/\s+/g, ' ').trim();
+  const EN_META = { title: document.title, description: $('meta[name="description"]').content };
+
+  // 1. Elements whose inner markup is a key (e.g. headings with a gradient span)
+  const els = $$('body *').filter((el) => el.children.length && !el.closest('svg, script') && ID[norm(el.innerHTML)]);
+  els.forEach((el) => { el.dataset.i18nEl = ''; el._en = norm(el.innerHTML); });
+
+  // 2. Plain text nodes outside those elements
+  const texts = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = walker.nextNode());) {
+    const key = norm(n.nodeValue);
+    if (key && ID[key] && !n.parentElement.closest('[data-i18n-el], script')) {
+      const [, lead, trail] = n.nodeValue.match(/^(\s*)[\s\S]*?(\s*)$/);
+      texts.push({ n, key, lead, trail });
+    }
+  }
+
+  // 3. Attributes
+  const attrs = [];
+  $$('[aria-label], img[alt]').forEach((el) => ['aria-label', 'alt'].forEach((a) => {
+    const v = el.getAttribute(a);
+    if (v && ID[v]) attrs.push({ el, a, key: v });
+  }));
+
+  const btn = $('.lang-toggle');
+  const apply = (next) => {
+    lang = next;
+    const id = lang === 'id';
+    document.documentElement.lang = lang;
+    els.forEach((el) => { el.innerHTML = id ? ID[el._en] : el._en; });
+    texts.forEach(({ n, key, lead, trail }) => { n.nodeValue = lead + (id ? ID[key] : key) + trail; });
+    attrs.forEach(({ el, a, key }) => el.setAttribute(a, id ? ID[key] : key));
+    const meta = id ? ID_META : EN_META;
+    document.title = meta.title;
+    $('meta[name="description"]').content = meta.description;
+    btn.textContent = id ? 'ID' : 'EN';
+    btn.setAttribute('aria-label', id ? 'Ganti bahasa ke English' : 'Switch language to Bahasa Indonesia');
+  };
+
+  btn.addEventListener('click', () => {
+    const next = lang === 'id' ? 'en' : 'id';
+    localStorage.setItem('lang', next);
+    apply(next);
+  });
+  apply(localStorage.getItem('lang') || (navigator.language.toLowerCase().startsWith('id') ? 'id' : 'en'));
+})();
+
 /* ---------- Theme toggle (circular reveal via View Transitions) ---------- */
 (() => {
   const btn = $('.theme-toggle');
@@ -55,7 +108,7 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const setMenu = (open) => {
     nav.classList.toggle('is-open', open);
     toggle.setAttribute('aria-expanded', open);
-    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    toggle.setAttribute('aria-label', t(open ? 'Close menu' : 'Open menu'));
     document.body.classList.toggle('menu-open', open);
   };
   toggle.addEventListener('click', () => setMenu(!nav.classList.contains('is-open')));
@@ -198,7 +251,7 @@ const toast = (() => {
 $$('[data-copy]').forEach((btn) => btn.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(btn.dataset.copy);
-    toast(`Copied “${btn.dataset.copy}” to clipboard`);
+    toast(`${t('Copied to clipboard')}: ${btn.dataset.copy}`);
   } catch {
     toast(`Discord: ${btn.dataset.copy}`);
   }

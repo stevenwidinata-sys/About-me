@@ -255,6 +255,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .icon-btn:hover { border-color: var(--cyan); box-shadow: var(--glow); }
 
+.lang-toggle { font-family: var(--font-mono); font-size: .78rem; font-weight: 600; letter-spacing: .04em; }
+
 /* ---------- Theme toggle ---------- */
 .theme-toggle { position: relative; overflow: hidden; }
 .theme-toggle .icon { position: absolute; transition: transform .5s var(--ease), opacity .3s; }
@@ -947,6 +949,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 @media (max-width: 880px) {
   .contact__panel { grid-template-columns: 1fr; }
+  .contact .hero__cta { justify-content: flex-start; }
   .social { grid-template-columns: auto 1fr; row-gap: 0; }
   .social__value { grid-column: 2; }
   .social .icon { grid-row: span 2; }
