@@ -40,3 +40,39 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!localStorage.getItem('theme')) root.dataset.theme = e.matches ? 'light' : 'dark';
   });
 })();
+
+
+/* ---------- Header: scrolled state, mobile menu, active link ---------- */
+(() => {
+  const header = $('.header');
+  const nav = $('#nav');
+  const toggle = $('.menu-toggle');
+
+  const onScroll = () => header.classList.toggle('is-scrolled', scrollY > 20);
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const setMenu = (open) => {
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', open);
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('menu-open', open);
+  };
+  toggle.addEventListener('click', () => setMenu(!nav.classList.contains('is-open')));
+  $$('.nav__link').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.classList.contains('is-open')) { setMenu(false); toggle.focus(); }
+  });
+
+  // Highlight the link of the section currently in view
+  const links = new Map($$('.nav__link').map((a) => [a.hash.slice(1), a]));
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      links.forEach((a) => { a.classList.remove('is-active'); a.removeAttribute('aria-current'); });
+      const a = links.get(en.target.id);
+      if (a) { a.classList.add('is-active'); a.setAttribute('aria-current', 'true'); }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  $$('main section[id]').forEach((s) => spy.observe(s));
+})();
