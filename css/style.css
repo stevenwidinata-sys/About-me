@@ -830,6 +830,81 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 /* make the whole card clickable via the link */
 .project__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 
+/* ---------- Achievements ---------- */
+.awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+.award { padding: 1.8rem 1.6rem; overflow: hidden; }
+.award::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  right: -40%;
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aurora-2), transparent 70%);
+  pointer-events: none;
+}
+.award:hover { transform: translateY(-4px); }
+.award__icon {
+  display: grid;
+  place-items: center;
+  width: 3rem; height: 3rem;
+  margin-bottom: 1.2rem;
+  border-radius: var(--radius);
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 10px 30px -10px var(--violet);
+}
+.award__icon svg { width: 1.5rem; height: 1.5rem; }
+.award__meta { font-family: var(--font-mono); font-size: .78rem; color: var(--cyan); margin-bottom: .45rem; }
+.award h3 { font-size: 1.25rem; margin-bottom: .4rem; }
+.award > p:last-child { color: var(--muted); }
+
+/* ---------- Possibilities ---------- */
+.next {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  counter-reset: next;
+}
+.next__item {
+  padding: 1.6rem 1.5rem 1.8rem;
+  counter-increment: next;
+  overflow: hidden;
+}
+.next__item::before {
+  content: "0" counter(next);
+  position: absolute;
+  right: 1rem;
+  bottom: -.6rem;
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  opacity: .05;
+}
+.next__item:hover { transform: translateY(-4px); border-color: var(--violet); }
+.next__num {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem; height: 2.4rem;
+  margin-bottom: 1.1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--cyan);
+}
+.next__item:hover .next__num { border-color: var(--cyan); box-shadow: var(--glow); }
+.next__item h3 { font-size: 1.15rem; margin-bottom: .5rem; }
+.next__item p { color: var(--muted); font-size: .95rem; }
+
+@media (max-width: 1024px) { .next { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px)  { .next { grid-template-columns: 1fr; } }
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
