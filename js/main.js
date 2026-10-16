@@ -157,3 +157,27 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   new IntersectionObserver(([en]) => { inView = en.isIntersecting; inView ? start() : stop(); }).observe(hero);
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
 })();
+
+/* ---------- Journey: the path fills and stars light up as you scroll ---------- */
+(() => {
+  const line = $('.timeline');
+  if (!line) return;
+  const items = $$('.timeline__item', line);
+  let ticking = false;
+
+  const update = () => {
+    ticking = false;
+    const r = line.getBoundingClientRect();
+    const mark = innerHeight * .6; // the "reading point" on screen
+    const p = Math.min(1, Math.max(0, (mark - r.top) / r.height));
+    line.style.setProperty('--progress', p.toFixed(4));
+    items.forEach((it) => {
+      const star = $('.timeline__star', it).getBoundingClientRect();
+      it.classList.toggle('is-lit', star.top < mark);
+    });
+  };
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  update();
+})();
