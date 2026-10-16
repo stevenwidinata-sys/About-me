@@ -76,3 +76,84 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   }, { rootMargin: '-45% 0px -50% 0px' });
   $$('main section[id]').forEach((s) => spy.observe(s));
 })();
+
+
+/* ---------- Hero constellation: stars link up near the pointer ---------- */
+(() => {
+  const canvas = $('.hero__sky');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const LINK = 130;   // max distance between linked stars
+  const REACH = 200;  // pointer influence radius
+  let w, h, dpr, stars = [], rgb = '226, 237, 247', running = false;
+  const pointer = { x: -9999, y: -9999 };
+
+  const readColor = () => {
+    rgb = getComputedStyle(document.documentElement).getPropertyValue('--star').trim();
+  };
+
+  const resize = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.min(160, Math.round((w * h) / 9000));
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - .5) * .18,
+      vy: (Math.random() - .5) * .18,
+      r: Math.random() * 1.4 + .4,
+      tw: Math.random() * Math.PI * 2,
+    }));
+  };
+
+  const draw = (t = 0) => {
+    ctx.clearRect(0, 0, w, h);
+    for (const s of stars) {
+      s.x = (s.x + s.vx + w) % w;
+      s.y = (s.y + s.vy + h) % h;
+      const near = Math.max(0, 1 - Math.hypot(s.x - pointer.x, s.y - pointer.y) / REACH);
+      const alpha = .35 + .3 * Math.sin(t / 900 + s.tw) + near * .6;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r + near * 1.4, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${rgb}, ${Math.min(alpha, 1)})`;
+      ctx.fill();
+      s.near = near;
+    }
+    // Lines only between stars near the pointer, so constellations "form" where you look
+    for (let i = 0; i < stars.length; i++) {
+      const a = stars[i];
+      if (!a.near) continue;
+      for (let j = i + 1; j < stars.length; j++) {
+        const b = stars[j];
+        if (!b.near) continue;
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d > LINK) continue;
+        ctx.strokeStyle = `rgba(${rgb}, ${(1 - d / LINK) * Math.min(a.near, b.near) * .9})`;
+        ctx.lineWidth = .8;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+    }
+  };
+
+  const loop = (t) => { if (!running) return; draw(t); requestAnimationFrame(loop); };
+  let inView = true;
+  const start = () => { if (running || reduceMotion || !inView || document.hidden) return; running = true; requestAnimationFrame(loop); };
+  const stop = () => { running = false; };
+
+  readColor(); resize(); draw();
+  addEventListener('resize', () => { resize(); draw(); });
+  new MutationObserver(() => { readColor(); if (!running) draw(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  const hero = canvas.parentElement;
+  hero.addEventListener('pointermove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top;
+  });
+  hero.addEventListener('pointerleave', () => { pointer.x = pointer.y = -9999; });
+
+  new IntersectionObserver(([en]) => { inView = en.isIntersecting; inView ? start() : stop(); }).observe(hero);
+  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+})();
