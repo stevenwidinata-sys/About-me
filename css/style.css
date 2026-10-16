@@ -905,6 +905,77 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 1024px) { .next { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px)  { .next { grid-template-columns: 1fr; } }
 
+/* ---------- Contact ---------- */
+.contact__panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.75rem, 5vw, 4rem);
+  overflow: hidden;
+}
+.contact__panel::before {
+  content: "";
+  position: absolute;
+  inset: auto -20% -60% auto;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aurora-1), transparent 65%);
+  pointer-events: none;
+}
+.contact__title { font-size: clamp(2.3rem, 5.5vw, 4rem); letter-spacing: -.035em; }
+
+.socials { display: grid; gap: .6rem; align-content: center; }
+.social {
+  display: grid;
+  grid-template-columns: auto 6.5rem 1fr;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: .95rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: left;
+  transition: border-color .25s, transform .3s var(--ease), background .25s;
+}
+.social:hover { border-color: var(--cyan); background: var(--surface-2); transform: translateX(4px); }
+.social .icon { color: var(--cyan); }
+.social__label { font-weight: 600; font-size: .95rem; }
+.social__value { color: var(--muted); font-size: .9rem; overflow-wrap: anywhere; }
+.social__hint { font-size: .75rem; opacity: .7; }
+
+@media (max-width: 880px) {
+  .contact__panel { grid-template-columns: 1fr; }
+  .social { grid-template-columns: auto 1fr; row-gap: 0; }
+  .social__value { grid-column: 2; }
+  .social .icon { grid-row: span 2; }
+}
+
+/* ---------- Footer ---------- */
+.footer { padding-block: 2rem 2.5rem; border-top: 1px solid var(--border); font-size: .88rem; color: var(--muted); }
+.footer__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem; }
+.footer__built { font-family: var(--font-mono); font-size: .78rem; }
+.footer__top:hover { color: var(--cyan); }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  z-index: 200;
+  padding: .7rem 1.2rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg-2);
+  box-shadow: var(--shadow);
+  font-size: .9rem;
+  transform: translate(-50%, 150%);
+  opacity: 0;
+  transition: transform .4s var(--ease), opacity .3s;
+}
+.toast.is-visible { transform: translate(-50%, 0); opacity: 1; }
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

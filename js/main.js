@@ -181,3 +181,27 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   addEventListener('resize', onScroll);
   update();
 })();
+
+
+/* ---------- Toast + copy-to-clipboard (Discord has no profile URL) ---------- */
+const toast = (() => {
+  const el = $('.toast');
+  let timer;
+  return (msg) => {
+    el.textContent = msg;
+    el.classList.add('is-visible');
+    clearTimeout(timer);
+    timer = setTimeout(() => el.classList.remove('is-visible'), 2200);
+  };
+})();
+
+$$('[data-copy]').forEach((btn) => btn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(btn.dataset.copy);
+    toast(`Copied “${btn.dataset.copy}” to clipboard`);
+  } catch {
+    toast(`Discord: ${btn.dataset.copy}`);
+  }
+}));
+
+$$('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
