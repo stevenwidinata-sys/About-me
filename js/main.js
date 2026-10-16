@@ -258,3 +258,45 @@ $$('[data-copy]').forEach((btn) => btn.addEventListener('click', async () => {
 }));
 
 $$('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
+
+/* ---------- Scroll reveal + count-up stats ---------- */
+(() => {
+  const countUp = (el) => {
+    const end = +el.dataset.count;
+    if (reduceMotion) return;
+    const t0 = performance.now();
+    const step = (t) => {
+      const p = Math.min(1, (t - t0) / 1200);
+      el.textContent = Math.round(end * (1 - (1 - p) ** 3));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+    if (!en.isIntersecting) return;
+    en.target.classList.add('is-in');
+    setTimeout(() => { en.target.style.transitionDelay = ''; }, 1200); // keep hover snappy afterwards
+    $$('[data-count]', en.target).forEach(countUp);
+    io.unobserve(en.target);
+  }), { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+
+  // stagger siblings inside the same grid
+  $$('.reveal').forEach((el) => {
+    const i = [...el.parentElement.children].filter((c) => c.classList.contains('reveal')).indexOf(el);
+    el.style.transitionDelay = `${Math.min(i, 4) * 80}ms`;
+    io.observe(el);
+  });
+})();
+
+/* ---------- Cursor spotlight on cards (pointer devices only) ---------- */
+if (matchMedia('(hover: hover)').matches) {
+  $$('.project, .award, .next__item, .about__story, .about__profile, .about__strengths').forEach((card) => {
+    card.classList.add('spot');
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+}
