@@ -586,6 +586,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .hero__lead { margin-inline: auto; }
   .hero__scroll { display: none; }
   .float-chip { font-size: .72rem; }
+  .hero__status { font-size: .74rem; }
   .float-chip--2 { right: -6%; }
 }
 
