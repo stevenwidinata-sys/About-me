@@ -587,6 +587,75 @@ ul { margin: 0; padding: 0; list-style: none; }
   .float-chip--2 { right: -6%; }
 }
 
+/* ---------- About ---------- */
+.about__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.25rem;
+}
+.about__story { grid-row: span 2; padding: clamp(1.5rem, 3vw, 2.4rem); display: grid; gap: 1.1rem; align-content: start; }
+.about__story p { color: var(--muted); font-size: 1.05rem; }
+.about__story strong { color: var(--text); font-weight: 600; }
+
+.about__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .75rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.about__stats li { display: grid; gap: .2rem; }
+.about__stats strong {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.about__stats span { font-size: .85rem; color: var(--muted); }
+
+.about__profile, .about__strengths { padding: 1.6rem; }
+.about__profile-title {
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.about__profile-title--sub { margin-top: 1.5rem; }
+
+.profile-list { margin: 0; display: grid; gap: .85rem; }
+.profile-list div { display: grid; grid-template-columns: 6.5rem 1fr; gap: .75rem; }
+.profile-list dt { color: var(--muted); font-size: .9rem; }
+.profile-list dd { margin: 0; font-weight: 500; display: flex; align-items: center; gap: .5rem; }
+
+.strengths { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.strengths li {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .55rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: .9rem;
+  font-weight: 500;
+  transition: border-color .25s, transform .3s var(--ease);
+}
+.strengths li:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.strengths span { color: var(--cyan); }
+.tech { display: flex; flex-wrap: wrap; gap: .45rem; }
+
+@media (max-width: 880px) {
+  .about__grid { grid-template-columns: 1fr; }
+  .about__story { grid-row: auto; }
+}
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
