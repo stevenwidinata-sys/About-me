@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Placeholder cover: replace with a screenshot of MixWich (same name, or update the src in index.html) -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <!-- sandwich layers -->
+  <g transform="translate(400 200)">
+    <path d="M-130 -30 Q-130 -100 0 -100 Q130 -100 130 -30 Z" fill="#fde68a"/>
+    <rect x="-140" y="-30" width="280" height="22" rx="11" fill="#34d399"/>
+    <rect x="-135" y="-8" width="270" height="26" rx="8" fill="#f472b6"/>
+    <rect x="-140" y="18" width="280" height="18" rx="9" fill="#fbbf24"/>
+    <rect x="-130" y="36" width="260" height="40" rx="14" fill="#fde68a"/>
+  </g>
+  <text x="400" y="400" text-anchor="middle" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" fill="#fff">MixWich</text>
+  <text x="400" y="440" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="18" fill="#fff" opacity=".7">cover placeholder · replace me</text>
+</svg>

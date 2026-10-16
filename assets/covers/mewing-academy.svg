@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Placeholder cover: replace with a screenshot of Mewing Academy (same name, or update the src in index.html) -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0e7490"/>
+      <stop offset="1" stop-color="#4c1d95"/>
+    </linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#fff" opacity=".12"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#dots)"/>
+  <!-- hand -->
+  <g transform="translate(400 210)" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".92">
+    <path d="M-50 60 V-10 M-25 50 V-55 M0 50 V-70 M25 50 V-55 M50 60 V-10"/>
+    <path d="M-50 60 Q-50 120 0 120 Q50 120 50 60"/>
+    <path d="M-50 20 Q-85 0 -95 30"/>
+  </g>
+  <g fill="#22d3ee"><circle cx="350" cy="155" r="7"/><circle cx="375" cy="140" r="7"/><circle cx="400" cy="125" r="7"/><circle cx="425" cy="140" r="7"/><circle cx="450" cy="185" r="7"/></g>
+  <text x="400" y="400" text-anchor="middle" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" fill="#fff">Mewing Academy</text>
+  <text x="400" y="440" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="18" fill="#fff" opacity=".7">cover placeholder · replace me</text>
+</svg>
