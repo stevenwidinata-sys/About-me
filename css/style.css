@@ -243,6 +243,27 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 .icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
 
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  transition: border-color .3s, box-shadow .3s, transform .3s var(--ease);
+}
+.icon-btn:hover { border-color: var(--cyan); box-shadow: var(--glow); }
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle { position: relative; overflow: hidden; }
+.theme-toggle .icon { position: absolute; transition: transform .5s var(--ease), opacity .3s; }
+[data-theme="dark"] .icon--sun,
+[data-theme="light"] .icon--moon { transform: translateY(140%) rotate(90deg); opacity: 0; }
+
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
