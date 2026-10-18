@@ -839,6 +839,19 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .project__link:hover svg { transform: translate(3px, -3px); }
 /* make the whole card clickable via the link */
 .project__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.project { transform-style: preserve-3d; will-change: transform; }
+.project__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--sx, 50%) var(--sy, 50%), rgba(255, 255, 255, .16), transparent 45%);
+  mix-blend-mode: overlay;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.project:hover .project__shine { opacity: 1; }
 
 /* ---------- Achievements ---------- */
 .awards {

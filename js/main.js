@@ -551,3 +551,26 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
     el.addEventListener('pointerleave', () => { el.style.transform = ''; });
   });
 }
+
+
+/* ---------- Project cards: 3D tilt + moving shine ---------- */
+if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
+  $$('.project').forEach((card) => {
+    const shine = document.createElement('span');
+    shine.className = 'project__shine';
+    shine.setAttribute('aria-hidden', 'true');
+    card.append(shine);
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      card.style.transition = 'transform .12s ease-out, border-color .3s';
+      card.style.transform = `perspective(900px) rotateX(${(.5 - py) * 10}deg) rotateY(${(px - .5) * 12}deg) translateY(-6px)`;
+      shine.style.setProperty('--sx', `${px * 100}%`);
+      shine.style.setProperty('--sy', `${py * 100}%`);
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.transition = 'transform .6s cubic-bezier(.22,1,.36,1), border-color .3s';
+      card.style.transform = '';
+    });
+  });
+}
