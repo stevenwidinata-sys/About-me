@@ -1118,8 +1118,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .cursor-ring.is-down::before { transform: scale(.8); }
 .over-star .cursor-ring::before,
 .is-dragging-star .cursor-ring::before { transform: scale(1.7); background: var(--grad); border-color: transparent; }
-.over-star .cursor-ring span,
-.is-dragging-star .has-cursor body, .has-cursor a, .has-cursor button { cursor: none; }
+.has-cursor body, .has-cursor a, .has-cursor button { cursor: none; }
 .has-cursor input, .has-cursor textarea { cursor: text; }
 
 /* ---------- Easter egg meteors ---------- */
