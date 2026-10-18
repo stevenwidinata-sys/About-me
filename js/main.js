@@ -131,50 +131,67 @@ const t = (s) => (lang === 'id' && ID[s]) || s;
 })();
 
 
-/* ---------- Hero constellation: stars link up near the pointer ---------- */
+/* ---------- Star sky (whole page): drag & throw stars; color follows height (top = rose, bottom = emerald) ---------- */
 (() => {
-  const canvas = $('.hero__sky');
+  const canvas = $('.sky');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const LINK = 130;   // max distance between linked stars
-  const REACH = 200;  // pointer influence radius
-  let w, h, dpr, stars = [], rgb = '226, 237, 247', running = false;
+  const LINK = 130, REACH = 200, GRAB = 22;
+  let w, h, dpr, stars = [], base, top, bottom;
   const pointer = { x: -9999, y: -9999 };
+  let held = null, prev = null;
 
-  const readColor = () => {
-    rgb = getComputedStyle(document.documentElement).getPropertyValue('--star').trim();
+  const triplet = (cs, k) => cs.getPropertyValue(k).split(',').map(Number);
+  const readColors = () => {
+    const cs = getComputedStyle(document.documentElement);
+    base = triplet(cs, '--star'); top = triplet(cs, '--star-top'); bottom = triplet(cs, '--star-bottom');
+  };
+  // middle band stays neutral; colour ramps in toward the edges
+  const colorFor = (y) => {
+    const t = (y / h - .5) * 2;                    // -1 top … 1 bottom
+    const k = Math.min(1, Math.max(0, (Math.abs(t) - .12) / .6));
+    const f = k * k * (3 - 2 * k);                 // smoothstep
+    const to = t < 0 ? top : bottom;
+    return base.map((v, i) => Math.round(v + (to[i] - v) * f));
   };
 
   const resize = () => {
     dpr = Math.min(devicePixelRatio || 1, 2);
-    w = canvas.clientWidth; h = canvas.clientHeight;
+    const ow = w, oh = h;
+    w = innerWidth; h = innerHeight;
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const count = Math.min(160, Math.round((w * h) / 9000));
+    if (ow) { stars.forEach((s) => { s.x *= w / ow; s.y *= h / oh; }); return; }
+    const count = Math.min(170, Math.round((w * h) / 8500));
+    const drift = reduceMotion ? 0 : .18;
     stars = Array.from({ length: count }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - .5) * .18,
-      vy: (Math.random() - .5) * .18,
-      r: Math.random() * 1.4 + .4,
-      tw: Math.random() * Math.PI * 2,
+      x: Math.random() * w, y: Math.random() * h,
+      vx: 0, vy: 0, dx: (Math.random() - .5) * drift, dy: (Math.random() - .5) * drift,
+      r: Math.random() * 1.4 + .5, tw: Math.random() * Math.PI * 2,
     }));
   };
 
-  const draw = (t = 0) => {
+  const draw = (t) => {
     ctx.clearRect(0, 0, w, h);
     for (const s of stars) {
-      s.x = (s.x + s.vx + w) % w;
-      s.y = (s.y + s.vy + h) % h;
-      const near = Math.max(0, 1 - Math.hypot(s.x - pointer.x, s.y - pointer.y) / REACH);
-      const alpha = .35 + .3 * Math.sin(t / 900 + s.tw) + near * .6;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r + near * 1.4, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${rgb}, ${Math.min(alpha, 1)})`;
-      ctx.fill();
-      s.near = near;
+      if (s !== held) {
+        // thrown velocity decays back to the gentle drift
+        s.vx *= .95; s.vy *= .95;
+        s.x += s.vx + s.dx; s.y += s.vy + s.dy;
+        if (s.x < 0 || s.x > w) { s.vx *= -.7; s.x = Math.min(w, Math.max(0, s.x)); s.dx *= -1; }
+        if (s.y < 0 || s.y > h) { s.vy *= -.7; s.y = Math.min(h, Math.max(0, s.y)); s.dy *= -1; }
+      }
+      s.near = s === held ? 1 : Math.max(0, 1 - Math.hypot(s.x - pointer.x, s.y - pointer.y) / REACH);
+      s.c = colorFor(s.y).join(',');
+      const alpha = Math.min(1, .45 + .3 * Math.sin(t / 900 + s.tw) + s.near * .5);
+      const r = s.r + s.near * 1.4 + (s === held ? 2 : 0);
+      if (s.near > .3 || s === held) { // halo
+        ctx.beginPath(); ctx.arc(s.x, s.y, r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${s.c}, ${s.near * .12})`; ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${s.c}, ${alpha})`; ctx.fill();
     }
-    // Lines only between stars near the pointer, so constellations "form" where you look
     for (let i = 0; i < stars.length; i++) {
       const a = stars[i];
       if (!a.near) continue;
@@ -183,34 +200,63 @@ const t = (s) => (lang === 'id' && ID[s]) || s;
         if (!b.near) continue;
         const d = Math.hypot(a.x - b.x, a.y - b.y);
         if (d > LINK) continue;
-        ctx.strokeStyle = `rgba(${rgb}, ${(1 - d / LINK) * Math.min(a.near, b.near) * .9})`;
-        ctx.lineWidth = .8;
+        const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y); // line blends both star colours
+        const o = (1 - d / LINK) * Math.min(a.near, b.near) * .9;
+        g.addColorStop(0, `rgba(${a.c}, ${o})`); g.addColorStop(1, `rgba(${b.c}, ${o})`);
+        ctx.strokeStyle = g; ctx.lineWidth = .9;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
     }
   };
 
+  let running = false;
   const loop = (t) => { if (!running) return; draw(t); requestAnimationFrame(loop); };
-  let inView = true;
-  const start = () => { if (running || reduceMotion || !inView || document.hidden) return; running = true; requestAnimationFrame(loop); };
-  const stop = () => { running = false; };
+  const start = () => { if (!running && !document.hidden) { running = true; requestAnimationFrame(loop); } };
+  document.addEventListener('visibilitychange', () => (document.hidden ? (running = false) : start()));
 
-  readColor(); resize(); draw();
-  addEventListener('resize', () => { resize(); draw(); });
-  new MutationObserver(() => { readColor(); if (!running) draw(); })
-    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  // --- dragging (mouse, pen, touch) ---
+  const hit = (x, y) => {
+    let best = null, bd = GRAB;
+    for (const s of stars) { const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; best = s; } }
+    return best;
+  };
+  const interactive = (el) => el.closest('a, button, input, textarea, select, label, [data-no-drag]');
+  const grab = (x, y, target) => {
+    if (interactive(target)) return false;
+    const s = hit(x, y);
+    if (!s) return false;
+    held = s; s.vx = s.vy = 0; prev = { x, y, t: performance.now() };
+    document.documentElement.classList.add('is-dragging-star');
+    return true;
+  };
+  const move = (x, y) => {
+    pointer.x = x; pointer.y = y;
+    document.documentElement.classList.toggle('over-star', !held && !!hit(x, y));
+    if (!held) return;
+    const now = performance.now(), dt = Math.max(16, now - prev.t);
+    held.vx = (x - prev.x) / dt * 16; held.vy = (y - prev.y) / dt * 16;
+    held.x = x; held.y = y; prev = { x, y, t: now };
+  };
+  const release = () => {
+    if (!held) return;
+    held.vx = Math.max(-25, Math.min(25, held.vx)); held.vy = Math.max(-25, Math.min(25, held.vy));
+    held = null;
+    document.documentElement.classList.remove('is-dragging-star');
+  };
 
-  const hero = canvas.parentElement;
-  hero.addEventListener('pointermove', (e) => {
-    const r = canvas.getBoundingClientRect();
-    pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top;
-  });
-  hero.addEventListener('pointerleave', () => { pointer.x = pointer.y = -9999; });
+  addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch' && grab(e.clientX, e.clientY, e.target)) e.preventDefault(); });
+  addEventListener('pointermove', (e) => { if (e.pointerType !== 'touch') move(e.clientX, e.clientY); }, { passive: true });
+  addEventListener('pointerup', release);
+  document.addEventListener('pointerleave', () => { pointer.x = pointer.y = -9999; release(); });
+  // touch: only block scrolling when a star is actually grabbed
+  addEventListener('touchstart', (e) => { const p = e.touches[0]; if (e.touches.length === 1 && grab(p.clientX, p.clientY, e.target)) e.preventDefault(); }, { passive: false });
+  addEventListener('touchmove', (e) => { if (held) { e.preventDefault(); move(e.touches[0].clientX, e.touches[0].clientY); } }, { passive: false });
+  addEventListener('touchend', () => { release(); pointer.x = pointer.y = -9999; });
 
-  new IntersectionObserver(([en]) => { inView = en.isIntersecting; inView ? start() : stop(); }).observe(hero);
-  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  readColors(); resize(); start();
+  addEventListener('resize', resize);
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 })();
-
 /* ---------- Journey: the path fills and stars light up as you scroll ---------- */
 (() => {
   const line = $('.timeline');

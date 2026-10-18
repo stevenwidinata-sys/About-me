@@ -34,6 +34,7 @@ const ID = {
   '✦ Leadership': '✦ Kepemimpinan',
   '⌘ Problem Solving': '⌘ Pemecahan Masalah',
   'Scroll to explore': 'Gulir untuk menjelajah',
+  'Psst, try dragging the stars.': 'Psst, coba tarik bintang-bintangnya.',
 
   // about
   'Who I am': 'Tentang saya',
