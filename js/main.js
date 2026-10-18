@@ -574,3 +574,36 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
     });
   });
 }
+
+
+/* ---------- Section headings decode with a scramble when they enter view (and on hover) ---------- */
+(() => {
+  if (reduceMotion) return;
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#%&*+=?';
+  const scramble = (el) => {
+    if (el._busy) return;
+    el._busy = true;
+    const nodes = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n; (n = walker.nextNode());) nodes.push({ n, text: n.nodeValue });
+    const total = nodes.reduce((s, x) => s + x.text.length, 0);
+    const t0 = performance.now(), DURATION = 650;
+    const tick = () => {
+      const revealed = ((performance.now() - t0) / DURATION) * total; // characters settled so far
+      let offset = 0;
+      nodes.forEach(({ n, text }) => {
+        n.nodeValue = [...text].map((ch, i) => (ch === ' ' || offset + i < revealed ? ch : CHARS[Math.floor(Math.random() * CHARS.length)])).join('');
+        offset += text.length;
+      });
+      if (revealed < total) setTimeout(tick, 30);
+      else { nodes.forEach(({ n, text }) => { n.nodeValue = text; }); el._busy = false; }
+    };
+    tick();
+  };
+
+  const titles = $$('.section-title, .contact__title');
+  const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+    if (en.isIntersecting) { scramble(en.target); io.unobserve(en.target); }
+  }), { threshold: .6 });
+  titles.forEach((el) => { io.observe(el); el.addEventListener('pointerenter', () => scramble(el)); });
+})();
