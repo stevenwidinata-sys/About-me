@@ -508,3 +508,32 @@ if (matchMedia('(hover: hover)').matches) {
   addEventListener('resize', set);
   set();
 })();
+
+
+/* ---------- Custom cursor: dot + lagging ring; grows on links, says "drag" over stars ---------- */
+(() => {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const dot = $('.cursor-dot'), ring = $('.cursor-ring');
+  const root = document.documentElement;
+  root.classList.add('has-cursor');
+  let x = -100, y = -100, rx = x, ry = y, shown = false;
+
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    x = e.clientX; y = e.clientY;
+    if (!shown) { rx = x; ry = y; shown = true; root.classList.add('cursor-on'); }
+    dot.style.transform = `translate(${x}px, ${y}px)`;
+    ring.classList.toggle('is-link', !!e.target.closest('a, button, [data-copy], .project'));
+  }, { passive: true });
+  document.addEventListener('pointerleave', () => { shown = false; root.classList.remove('cursor-on'); });
+  addEventListener('pointerdown', () => ring.classList.add('is-down'));
+  addEventListener('pointerup', () => ring.classList.remove('is-down'));
+
+  const follow = () => {
+    rx += (x - rx) * (reduceMotion ? 1 : .18);
+    ry += (y - ry) * (reduceMotion ? 1 : .18);
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(follow);
+  };
+  follow();
+})();
