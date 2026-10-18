@@ -607,3 +607,29 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
   }), { threshold: .6 });
   titles.forEach((el) => { io.observe(el); el.addEventListener('pointerenter', () => scramble(el)); });
 })();
+
+/* ---------- Easter egg: click the logo 5 times quickly for a meteor shower ---------- */
+(() => {
+  const logo = $('.brand');
+  let clicks = 0, timer;
+  const shower = () => {
+    const colors = ['var(--cyan)', 'var(--violet)', 'var(--pink)', 'rgb(var(--star-top))', 'rgb(var(--star-bottom))'];
+    for (let i = 0; i < 28; i++) {
+      const m = document.createElement('span');
+      m.className = 'meteor';
+      m.style.left = `${Math.random() * 110 - 5}vw`;
+      m.style.top = `${Math.random() * 40 - 20}vh`;
+      m.style.setProperty('--c', colors[i % colors.length]);
+      m.style.animationDelay = `${Math.random() * 1.2}s`;
+      m.style.animationDuration = `${.9 + Math.random() * .8}s`;
+      document.body.append(m);
+      m.addEventListener('animationend', () => m.remove());
+    }
+    toast(t('You found the meteor shower! Make a wish.'));
+  };
+  logo.addEventListener('click', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { clicks = 0; }, 1500);
+    if (++clicks === 5) { clicks = 0; if (!reduceMotion) shower(); else toast(t('You found the meteor shower! Make a wish.')); }
+  });
+})();

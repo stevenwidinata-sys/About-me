@@ -1133,6 +1133,26 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .has-cursor body, .has-cursor a, .has-cursor button { cursor: none; }
 .has-cursor input, .has-cursor textarea { cursor: text; }
 
+/* ---------- Easter egg meteors ---------- */
+.meteor {
+  position: fixed;
+  z-index: 250;
+  width: 240px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #fff, var(--c) 12%, transparent);
+  filter: drop-shadow(0 0 6px var(--c));
+  pointer-events: none;
+  transform: rotate(-145deg);
+  animation: meteor 1.2s ease-in both;
+}
+.meteor::before { content: ""; position: absolute; left: -3px; top: -3px; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 14px 4px var(--c); }
+@keyframes meteor {
+  from { transform: rotate(-145deg) translateX(0); opacity: 0; }
+  15%  { opacity: 1; }
+  to   { transform: rotate(-145deg) translateX(-130vh); opacity: 0; }
+}
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

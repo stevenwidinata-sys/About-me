@@ -23,6 +23,7 @@ const ID = {
   'Open menu': 'Buka menu',
   'Close menu': 'Tutup menu',
   'Copied to clipboard': 'Disalin ke clipboard',
+  'You found the meteor shower! Make a wish.': 'Kamu menemukan hujan meteor! Buat permohonan.',
 
   // hero
   'Information Technology student @ BINUS University': 'Mahasiswa Teknologi Informasi @ BINUS University',
