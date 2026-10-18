@@ -537,3 +537,17 @@ if (matchMedia('(hover: hover)').matches) {
   };
   follow();
 })();
+
+
+/* ---------- Magnetic buttons: pulled slightly toward the cursor ---------- */
+if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
+  $$('.btn, .icon-btn').forEach((el) => {
+    const STRENGTH = el.classList.contains('btn') ? .3 : .4;
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      el.style.transform = `translate(${dx * STRENGTH}px, ${dy * STRENGTH}px)`;
+    });
+    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+  });
+}
