@@ -300,3 +300,84 @@ if (matchMedia('(hover: hover)').matches) {
     });
   });
 }
+
+/* ---------- Cursor grid glow (whole page): cells light up and fade, colored by screen position ---------- */
+(() => {
+  const canvas = $('.grid-glow');
+  if (!canvas || reduceMotion || !matchMedia('(hover: hover)').matches) return;
+  const ctx = canvas.getContext('2d');
+  const CELL = 64;
+  const RADIUS = 2.6;  // in cells
+  let cols, rows, heat, w, h, dpr, last = null, running = false, palette = [];
+
+  const hex = (v) => { const n = parseInt(v.trim().slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const readPalette = () => {
+    const cs = getComputedStyle(document.documentElement);
+    palette = ['--cyan', '--violet', '--pink'].map((k) => hex(cs.getPropertyValue(k)));
+  };
+  // left→right: cyan → violet → pink
+  const colorAt = (x) => {
+    const t = Math.min(1, Math.max(0, x / w)) * 2;
+    const [a, b] = t < 1 ? [palette[0], palette[1]] : [palette[1], palette[2]];
+    const f = t < 1 ? t : t - 1;
+    return a.map((v, i) => Math.round(v + (b[i] - v) * f)).join(',');
+  };
+
+  const resize = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(w / CELL) + 1; rows = Math.ceil(h / CELL) + 1;
+    heat = new Float32Array(cols * rows);
+  };
+
+  const heatAt = (x, y, strength) => {
+    const cx = x / CELL, cy = y / CELL;
+    for (let r = Math.max(0, Math.floor(cy - RADIUS)); r <= Math.min(rows - 1, cy + RADIUS); r++) {
+      for (let c = Math.max(0, Math.floor(cx - RADIUS)); c <= Math.min(cols - 1, cx + RADIUS); c++) {
+        // ring falloff measured from cell centre
+        const d = Math.hypot(c + .5 - cx, r + .5 - cy) / RADIUS;
+        if (d < 1) { const i = r * cols + c; heat[i] = Math.min(1, Math.max(heat[i], (1 - d) ** 1.6 * strength)); }
+      }
+    }
+  };
+
+  const frame = () => {
+    ctx.clearRect(0, 0, w, h);
+    const light = document.documentElement.dataset.theme === 'light';
+    let alive = false;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c, v = heat[i];
+        if (v < .01) { heat[i] = 0; continue; }
+        alive = true;
+        ctx.fillStyle = `rgba(${colorAt(c * CELL)}, ${v * (light ? .28 : .5)})`;
+        ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1);
+        heat[i] = v * .94; // fade → trail
+      }
+    }
+    if (alive) requestAnimationFrame(frame); else running = false;
+  };
+  const kick = () => { if (!running) { running = true; requestAnimationFrame(frame); } };
+
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    // faster movement = brighter, longer trail; interpolate so quick swipes leave no gaps
+    const speed = last ? Math.hypot(e.clientX - last.x, e.clientY - last.y) : 0;
+    const strength = Math.min(1, .55 + speed / 60);
+    const steps = last ? Math.min(12, Math.ceil(speed / (CELL / 2))) : 1;
+    for (let s = 1; s <= steps; s++) {
+      const x = last ? last.x + (e.clientX - last.x) * (s / steps) : e.clientX;
+      const y = last ? last.y + (e.clientY - last.y) * (s / steps) : e.clientY;
+      heatAt(x, y, strength);
+    }
+    last = { x: e.clientX, y: e.clientY };
+    kick();
+  }, { passive: true });
+  document.addEventListener('pointerleave', () => { last = null; });
+
+  readPalette(); resize();
+  addEventListener('resize', resize);
+  new MutationObserver(readPalette).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
