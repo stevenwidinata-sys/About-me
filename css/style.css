@@ -792,6 +792,24 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .timeline__chapter time { margin-right: .4rem; font-family: var(--font-mono); font-size: .85rem; font-weight: 400; color: var(--cyan); }
 .timeline__chapter a:hover { color: var(--cyan); }
 
+/* hover: card lifts & grows, its star pulses */
+.timeline__card { transition: transform .45s var(--ease), border-color .3s, box-shadow .45s, background .3s; }
+.timeline__item:hover .timeline__card {
+  transform: translateY(-4px) scale(1.025);
+  border-color: color-mix(in srgb, var(--violet) 55%, transparent);
+  box-shadow: var(--shadow), 0 0 40px -12px var(--violet);
+}
+.timeline__item:hover .timeline__star { transform: translate(-50%, -50%) scale(1.35); }
+.timeline__item:hover .timeline__star::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  animation: star-pulse 1.2s ease-out infinite;
+}
+@keyframes star-pulse { to { transform: scale(2.8); opacity: 0; } }
+
 @media (max-width: 760px) {
   .timeline::before, .timeline::after { left: 7px; }
   .timeline__item, .timeline__item--chapter { grid-template-columns: 1fr; padding-left: 2.25rem; }
