@@ -427,3 +427,72 @@ if (matchMedia('(hover: hover)').matches) {
   addEventListener('resize', resize);
   new MutationObserver(readPalette).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 })();
+
+
+/* ---------- Rolling tagline: letters spin like a slot machine and land left → right ---------- */
+(() => {
+  const groups = $$('[data-roll]');
+  if (!groups.length) return;
+  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*#%&@';
+  const letters = [];
+
+  groups.forEach((g) => {
+    const text = g.textContent;
+    g.textContent = '';
+    g.setAttribute('aria-hidden', 'true'); // parent <p> carries the aria-label
+    [...text].forEach((ch, i) => {
+      const s = document.createElement('span');
+      s.className = 'roll__ch';
+      s.textContent = ch;
+      s.dataset.ch = ch;
+      if (g.classList.contains('roll--grad')) {
+        // per-letter gradient (background-clip breaks on transformed children)
+        const t = i / Math.max(1, text.length - 1);
+        s.style.color = t < .5
+          ? `color-mix(in oklab, var(--violet) ${t * 200}%, var(--cyan))`
+          : `color-mix(in oklab, var(--pink) ${(t - .5) * 200}%, var(--violet))`;
+      }
+      g.append(s);
+      letters.push(s);
+    });
+  });
+  if (reduceMotion) return;
+
+  // lock each slot's width to its real letter so random glyphs don't shift the line
+  const lock = () => letters.forEach((s) => { s.style.width = ''; s.textContent = s.dataset.ch; s.style.width = `${s.getBoundingClientRect().width}px`; });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(lock);
+  addEventListener('resize', lock);
+  const pick = (ch) => {
+    const pool = ch === ch.toLowerCase() ? 'abcdefghijklmnopqrstuvwxyz' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    return /[a-z]/i.test(ch) ? pool[Math.floor(Math.random() * pool.length)] : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+  };
+
+  const rollAll = () => {
+    letters.forEach((s, i) => {
+      if (s.dataset.ch === ' ') return;
+      setTimeout(() => {
+        s.classList.remove('is-rolling'); void s.offsetWidth; s.classList.add('is-rolling');
+        let n = 0;
+        const iv = setInterval(() => {
+          s.textContent = ++n > 5 ? s.dataset.ch : pick(s.dataset.ch);
+          if (n > 5) clearInterval(iv);
+        }, 55);
+      }, i * 38);
+    });
+  };
+  setTimeout(rollAll, 600);
+  setInterval(() => { if (!document.hidden) rollAll(); }, 7000);
+  $('.hero__tagline').addEventListener('pointerenter', rollAll);
+})();
+
+/* ---------- Marquee: endless scroll that slows on hover ---------- */
+(() => {
+  const track = $('.marquee__track');
+  if (!track || reduceMotion) return;
+  // duplicate content so translating by -50% loops seamlessly
+  track.innerHTML += track.innerHTML;
+  const anim = track.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }], { duration: 40000, iterations: Infinity });
+  const band = track.parentElement;
+  band.addEventListener('pointerenter', () => { anim.playbackRate = .25; });
+  band.addEventListener('pointerleave', () => { anim.playbackRate = 1; });
+})();

@@ -1002,6 +1002,43 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   pointer-events: none;
 }
 
+/* ---------- Rolling tagline (slot-machine letters) ---------- */
+.roll { display: inline-flex; flex-wrap: nowrap; white-space: pre; }
+.roll__ch { display: inline-block; text-align: center; }
+.roll__ch.is-rolling { animation: roll .55s var(--ease) both; }
+@keyframes roll {
+  0%   { transform: translateY(-.55em); opacity: 0; filter: blur(4px); }
+  60%  { transform: translateY(.08em); opacity: 1; filter: blur(0); }
+  100% { transform: none; }
+}
+
+/* ---------- Marquee band ---------- */
+.marquee {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding-block: 1.1rem;
+  border-block: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: rotate(-1.5deg) scale(1.02);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee__track {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: max-content;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+.marquee__outline { color: transparent; -webkit-text-stroke: 1.2px var(--text); opacity: .8; }
+.marquee__track i { font-style: normal; font-size: .6em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
