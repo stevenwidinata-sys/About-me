@@ -496,3 +496,15 @@ if (matchMedia('(hover: hover)').matches) {
   band.addEventListener('pointerenter', () => { anim.playbackRate = .25; });
   band.addEventListener('pointerleave', () => { anim.playbackRate = 1; });
 })();
+
+/* ---------- Scroll progress bar ---------- */
+(() => {
+  const bar = $('.progress');
+  const set = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : 0);
+  };
+  addEventListener('scroll', set, { passive: true });
+  addEventListener('resize', set);
+  set();
+})();

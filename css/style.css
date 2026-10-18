@@ -1039,6 +1039,19 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .marquee__outline { color: transparent; -webkit-text-stroke: 1.2px var(--text); opacity: .8; }
 .marquee__track i { font-style: normal; font-size: .6em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
+/* ---------- Scroll progress ---------- */
+.progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 300;
+  height: 3px;
+  background: var(--grad);
+  box-shadow: 0 0 12px var(--violet);
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+  pointer-events: none;
+}
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
