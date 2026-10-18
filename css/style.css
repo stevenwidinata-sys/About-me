@@ -1116,8 +1116,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .cursor-ring.is-link::before { transform: scale(1.6); background: color-mix(in srgb, var(--cyan) 12%, transparent); border-color: var(--cyan); }
 .cursor-ring.is-down::before { transform: scale(.8); }
-.over-star .cursor-ring::before,
-.is-dragging-star .cursor-ring::before { transform: scale(1.7); background: var(--grad); border-color: transparent; }
 .has-cursor body, .has-cursor a, .has-cursor button { cursor: none; }
 .has-cursor input, .has-cursor textarea { cursor: text; }
 
