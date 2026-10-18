@@ -19,24 +19,27 @@
 :root,
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #070b14;
-  --bg-2: #0b1222;
+  --bg: #050816;
+  --bg-2: #0a1024;
   --surface: rgba(148, 163, 184, .06);
   --surface-2: rgba(148, 163, 184, .1);
   --border: rgba(148, 163, 184, .14);
   --border-strong: rgba(148, 163, 184, .28);
   --text: #e6edf7;
   --muted: #94a3b8;
-  --cyan: #22d3ee;
-  --violet: #8b5cf6;
-  --pink: #f472b6;
-  --grad: linear-gradient(120deg, var(--cyan), var(--violet));
-  --glow: 0 0 40px rgba(34, 211, 238, .25);
+  --cyan: #2de2ff;
+  --violet: #9b6bff;
+  --pink: #ff5cad;
+  --grad: linear-gradient(120deg, var(--cyan), var(--violet) 55%, var(--pink));
+  --glow: 0 0 40px rgba(45, 226, 255, .3);
   --shadow: 0 20px 50px -20px rgba(0, 0, 0, .7);
-  --aurora-1: rgba(34, 211, 238, .16);
-  --aurora-2: rgba(139, 92, 246, .2);
+  --aurora-1: rgba(45, 226, 255, .18);
+  --aurora-2: rgba(155, 107, 255, .24);
+  --aurora-3: rgba(255, 92, 173, .14);
   --grid-line: rgba(148, 163, 184, .06);
   --star: 226, 237, 247;
+  --star-top: 251, 113, 133;    /* rose  */
+  --star-bottom: 52, 211, 153;  /* emerald */
 }
 
 /* Cyber Aurora — light */
@@ -57,8 +60,11 @@
   --shadow: 0 20px 50px -24px rgba(15, 23, 42, .25);
   --aurora-1: rgba(8, 145, 178, .14);
   --aurora-2: rgba(124, 58, 237, .14);
+  --aurora-3: rgba(219, 39, 119, .1);
   --grid-line: rgba(15, 23, 42, .05);
   --star: 30, 41, 59;
+  --star-top: 225, 29, 72;
+  --star-bottom: 5, 150, 105;
 }
 
 /* ---------- Base ---------- */
@@ -146,6 +152,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .aurora--1 { top: -25vmax; left: -15vmax; background: radial-gradient(circle, var(--aurora-1), transparent 65%); }
 .aurora--2 { top: 10vmax; right: -25vmax; background: radial-gradient(circle, var(--aurora-2), transparent 65%); animation-duration: 32s; animation-direction: alternate-reverse; }
+.aurora--3 { bottom: -30vmax; left: 20vmax; background: radial-gradient(circle, var(--aurora-3), transparent 65%); animation-duration: 38s; }
 
 @keyframes drift {
   from { transform: translate3d(0, 0, 0) scale(1); }
